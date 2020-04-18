@@ -1,5 +1,4 @@
 import requests
-import pprint
 import time
 import json
 
@@ -51,14 +50,13 @@ class User:
             'extended': '0'
         }
         response = requests.get('https://api.vk.com/method/groups.get', params=params)
-        print('-', end='')
         if 'response' in response.json():
             return response.json()['response']['items']
         else:
             return None
 
-class Group:
 
+class Group:
     def __init__(self, id):
         self.id = id
 
@@ -73,44 +71,50 @@ class Group:
         response = requests.get('https://api.vk.com/method/groups.getById', params=params)
         return response.json()['response'][0]
 
-user1 = User('oleksin')
 
-user_friend_list = user1.friend_list()
+def get_friend_group_list(user_friend_list):
+    print('Запрашиваем списки групп друзей пользователя...')
+    friend_group_list = []
+    req_count = 1
+    for friend in user_friend_list:
+        friend_gl = friend.group_list()
+        print(f'Запрос № {req_count} из {len(user_friend_list)} ({round(req_count / len(user_friend_list) * 100, 1)}%)\r', end='')
+        req_count += 1
+        time.sleep(0.333)
+        if friend_gl:
+            friend_group_list.extend(friend_gl)
+        else:
+            continue
+    friend_group_list = list(set(friend_group_list))
+    return friend_group_list
 
-user_group_list = user1.group_list()
 
-friend_group_list = []
-
-print('Requesting group lists of friends...')
-
-for friend in user_friend_list:
-    friend_gl = friend.group_list()
-    time.sleep(0.33)
-    if friend_gl:
-        friend_group_list.extend(friend_gl)
+def get_different_group_list(user_group_list, friend_group_list):
+    diff_group_list = [Group(x) for x in user_group_list if x not in friend_group_list]
+    if diff_group_list:
+        print('Запрашиваем информацию об уникальных группах пользователя...')
+        group_list_clean = []
+        req_count = 1
+        for group in diff_group_list:
+            print(f'Запрос № {req_count} из {len(diff_group_list)} ({round(req_count / len(diff_group_list) * 100, 1)}%)\r', end='')
+            ginfo = group.get_info()
+            ginfo_clean = {key: ginfo[key] for key in ['name', 'id', 'members_count']}
+            group_list_clean.append(ginfo_clean)
+            time.sleep(0.333)
+            req_count += 1
+        return group_list_clean
     else:
-        continue
+        print('У данного пользователя нет уникальных групп')
+        return 'У данного пользователя нет уникальных групп'
 
-friend_group_list = list(set(friend_group_list))
 
-diff_group_list = [x for x in user_group_list if x not in friend_group_list]
+user1 = User(input('Введите идентификатор пользователя в сети VK: '))
 
-dgl = []
+output = get_different_group_list(user1.group_list(), get_friend_group_list(user1.friend_list()))
 
-for group in diff_group_list:
-    dgl.append(Group(group))
-
-glist = []
-
-for group in dgl:
-    ginfo = group.get_info()
-    ginfo_clean = {key : ginfo[key] for key in ['name','id','members_count']}
-    glist.append(ginfo_clean)
-
-print(glist)
-
-with open('groups.json', 'w', encoding='utf-8') as output:
-    json.dump(glist, output, ensure_ascii=False, indent=4)
+with open('groups.json', 'w', encoding='utf-8') as f:
+    json.dump(output, f, ensure_ascii=False, indent=4)
+    print('Данные об уникальный группах пользователя записаны в файл groups.json')
 
 
 
