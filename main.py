@@ -20,7 +20,7 @@ class User:
                     'fields': 'id'
                 }
                 response = requests.get('https://api.vk.com/method/users.get', params=params)
-                if 'respons' in response.json():
+                if 'response' in response.json():
                     self.user_id = response.json()['response'][0]['id']
                 else:
                     exit('Проблема с доступом к профилю пользователя. Возможно, он ограничен настройками приватности')
