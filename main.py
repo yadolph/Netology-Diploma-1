@@ -95,7 +95,7 @@ def get_friend_group_list(user_friend_list):
 def get_different_group_list(user_group_list, friend_group_list):
     diff_group_list = [Group(x) for x in user_group_list if x not in friend_group_list]
     if diff_group_list:
-        print('Запрашиваем информацию об уникальных группах пользователя...')
+        print('\nЗапрашиваем информацию об уникальных группах пользователя...')
         group_list_clean = []
         req_count = 1
         for group in diff_group_list:
@@ -117,7 +117,7 @@ output = get_different_group_list(user1.group_list(), get_friend_group_list(user
 
 with open('groups.json', 'w', encoding='utf-8') as f:
     json.dump(output, f, ensure_ascii=False, indent=4)
-    print('Данные об уникальный группах пользователя записаны в файл groups.json')
+    print('\nДанные об уникальный группах пользователя записаны в файл groups.json')
 
 
 
