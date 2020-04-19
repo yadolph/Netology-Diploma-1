@@ -81,7 +81,7 @@ def get_friend_group_list(user_friend_list):
     req_count = 1
     for friend in user_friend_list:
         friend_gl = friend.group_list()
-        print(f'Запрос № {req_count} из {len(user_friend_list)} ({round(req_count / len(user_friend_list) * 100, 1)}%)\r', end='')
+        print(f'\rЗапрос № {req_count} из {len(user_friend_list)} ({round(req_count / len(user_friend_list) * 100, 1)}%)', end='')
         req_count += 1
         time.sleep(0.333)
         if friend_gl:
@@ -99,7 +99,7 @@ def get_different_group_list(user_group_list, friend_group_list):
         group_list_clean = []
         req_count = 1
         for group in diff_group_list:
-            print(f'Запрос № {req_count} из {len(diff_group_list)} ({round(req_count / len(diff_group_list) * 100, 1)}%)\r', end='')
+            print(f'\rЗапрос № {req_count} из {len(diff_group_list)} ({round(req_count / len(diff_group_list) * 100, 1)}%)', end='')
             ginfo = group.get_info()
             ginfo_clean = {key: ginfo[key] for key in ['name', 'id', 'members_count']}
             group_list_clean.append(ginfo_clean)
